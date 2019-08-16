@@ -3,26 +3,19 @@ require 'json'
 
 # SImple test class
 class App < Roda
-  # Allows before do actions
-  plugin :hooks
+  SOME_CONSTANT = 22
 
+  plugin :hooks       # Allows before-do actions, ALTERNATIVE is :roda-symbolized-params
+  plugin :hash_routes # Use routes in separate files
+
+  Dir['./routes/*.rb'].each { |f| require f }
+
+  # Convert params keys to symbols
   before do
     request.params.transform_keys!(&:to_sym)
   end
 
-  route do |r|
-    r.on 'data' do
-      r.get do
-        p r.params
-        r.params.to_json
-      end
-
-      r.post do
-        p r.params
-        r.params.to_json
-      end
-    end
-  end
+  route(&:hash_routes)
 end
 
 run App
