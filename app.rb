@@ -19,8 +19,6 @@ class App < Roda
   route(&:hash_routes)
 end
 
-run App
-
 # def func
 #   p 'test method'
 # end
