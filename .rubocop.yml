@@ -1,0 +1,16 @@
+Metrics/LineLength:
+  Max: 99
+
+Metrics/MethodLength:
+  Max: 15
+
+Documentation:
+  Enabled: false
+
+# Prefer lambda.(var) to lambda.call(var)
+Style/LambdaCall:
+  EnforcedStyle: braces
+
+# Allow multi-line blocks delimited by {...} esp. for Sequel statements
+Style/BlockDelimiters:
+  Enabled: false
