@@ -4,13 +4,13 @@ class App
     r.get do
       p "GET #{SOME_CONSTANT}"
       p r.params
-      r.params.to_json
+      r.params
     end
 
     r.post do
       p "POST #{SOME_CONSTANT}"
       p r.params
-      r.params.to_json
+      r.params
     end
   end
 end

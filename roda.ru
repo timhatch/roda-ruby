@@ -7,6 +7,7 @@ class App < Roda
 
   plugin :hooks       # Allows before-do actions, ALTERNATIVE is :roda-symbolized-params
   plugin :hash_routes # Use routes in separate files
+  plugin :json
 
   Dir['./routes/*.rb'].each { |f| require f }
 
