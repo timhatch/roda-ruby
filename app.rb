@@ -7,7 +7,8 @@ class App < Roda
 
   plugin :hooks       # Allows before-do actions, ALTERNATIVE is :roda-symbolized-params
   plugin :hash_routes # Use routes in separate files
-  plugin :json
+  plugin :json        # Return responses as JSON
+  plugin :json_parser # Parses request bodies as JSON where Content-Type==application/json
 
   Dir['./routes/*.rb'].each { |f| require f }
 
