@@ -1,6 +1,3 @@
-require 'roda'
-require 'json'
-
 # SImple test class
 class App < Roda
   SOME_CONSTANT = 22
@@ -10,10 +7,12 @@ class App < Roda
   plugin :json        # Return responses as JSON
   plugin :json_parser # Parses request bodies as JSON where Content-Type==application/json
 
-  Dir['./routes/*.rb'].each { |f| require f }
+  Unreloader.require('routes')
+  Unreloader.record_split_class(__FILE__, 'routes')
 
   # Convert params keys to symbols
   before do
+    p 'before-do'
     request.params.transform_keys!(&:to_sym)
   end
 
