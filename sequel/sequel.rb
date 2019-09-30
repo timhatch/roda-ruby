@@ -14,12 +14,13 @@ require_relative 'boulder_modus'
 Sequel.extension :pg_array_ops # Needed to query stored arrays
 Sequel.extension :pg_json_ops # Needed to query stored arrays
 
-class Results < Sequel::Model
+class Results < Sequel::Model(:results)
   dataset_module do
-    select :person, :per_id, :rank_prev_heat, :result_jsonb
+    select :person, :per_id, :firstname, :lastname, :nation, :result_jsonb, :rank_prev_heat
 
     def for(wet_id:, grp_id:, route:)
       person
+        .join(:climbers, [:per_id])
         .where(wet_id: wet_id, grp_id: grp_id, route: route)
         .select_append(&Perseus::StandardBoulderModus.method(:base_rank))
         .select_append(&Perseus::StandardBoulderModus.method(:tie_break))
