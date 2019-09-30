@@ -5,7 +5,7 @@ require 'sequel'
 require 'pg'
 
 module Perseus
-  module CombinedBoulderModus
+  module StandardBoulderModus
     # private_class_method
 
     # Simple helper to calculate tops/bonuses and the relevant number of attempts
@@ -22,6 +22,7 @@ module Perseus
 
     module_function
 
+    # sig { returns(Array[Integer]) }
     # NOTE: Updated 18-02-2018 to use the revised scoring system for 2018
     # Sequel helper function to calculate a rank-order value sorting a boulder result by
     # tops (descending), bonuses (descending), top attempts (ascending), bonus attempts
@@ -30,10 +31,6 @@ module Perseus
     # are always ranked below competitors who have started
     # FIXME: This is fine for simple case where we use countbacks in a binary fashion, but it's
     # doesn't deal with the case where we want to apply countbacks only for podium places
-    def rank_generator
-      results + countbacks + [:rank_prev_heat]
-    end
-
     def results
       [
         Sequel.pg_array_op(:sort_values)[1].desc(nulls: :last),
@@ -43,8 +40,10 @@ module Perseus
       ]
     end
 
-    def countbacks
-      (1..8).map { |i| Sequel.pg_array_op(:countbacks)[i] }
+    # sig { returns(Array[Integer]) }
+    # TODO: Modify to deal with an arbitrary number of blocs (here assumes max = 4)
+    def tie_breaks
+      (1..8).map { |i| Sequel.pg_array_op(:tie_breaks)[i] }
     end
 
     # Merge any update into the results, e.g.
@@ -55,21 +54,17 @@ module Perseus
     # - A Hash containing the unmodified result
     # - A Hash containing the new result to be merged in
     # NOTE: PostGreSQL's jsonb functionality may allow this to be dispensed with.
-    #
-    # def merge(result, update)
-    #   result ||= {}
-    #   result.merge(update)
-    # end
+    def merge(result, update)
+      result ||= {}
+      result.merge(update)
+    end
 
     # Calculate the overall result for the competitor (i.e. 1t2 3b4), storing the result in
     # an array.
     # sig { params(result_jsonb: Hash).returns(Array[Integer]) }
     # NOTE: <result_jsonb> is a hash containing the result, e.g.
     #       { p1: { a: 1, b: 1, t:1 }, p2: { a: 3, b: 3 } }
-    # FIXME: Append sort_values for attempts to top and attempts to Zone in order to
-    # implement countbacks
-    #
-    def update_sort_values(result_jsonb)
+    def update_sortvalues(result_jsonb)
       barr = [0, 0]
       tarr = [0, 0]
 
@@ -82,7 +77,9 @@ module Perseus
       tarr + barr
     end
 
-    def update_countback_values(result_jsonb)
+    # sig { params(result_jsonb: Hash).returns(Array[Integer]) }
+    # TODO: Modify to deal with an arbitrary number of blocs (here assumes max = 4)
+    def update_tiebreaks(result_jsonb)
       barr = [0, 0, 0, 0]
       tarr = [0, 0, 0, 0]
 
