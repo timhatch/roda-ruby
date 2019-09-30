@@ -22,7 +22,7 @@ module Perseus
 
     module_function
 
-    # sig { returns(Array[Integer]) }
+    # sig { returns(Sequel::AliasedExpression) }
     # NOTE: Updated 18-02-2018 to use the revised scoring system for 2018
     # Sequel helper function to calculate a rank-order value sorting a boulder result by
     # tops (descending), bonuses (descending), top attempts (ascending), bonus attempts
@@ -31,19 +31,23 @@ module Perseus
     # are always ranked below competitors who have started
     # FIXME: This is fine for simple case where we use countbacks in a binary fashion, but it's
     # doesn't deal with the case where we want to apply countbacks only for podium places
-    def results
-      [
+    def base_rank
+      rank_arr = [
         Sequel.pg_array_op(:sort_values)[1].desc(nulls: :last),
         Sequel.pg_array_op(:sort_values)[3].desc,
         Sequel.pg_array_op(:sort_values)[2],
         Sequel.pg_array_op(:sort_values)[4]
       ]
+
+      Sequel.function(:rank).over(order: rank_arr).as(:base_rank)
     end
 
-    # sig { returns(Array[Integer]) }
+    # sig { returns(Sequel::AliasedExpression) }
     # TODO: Modify to deal with an arbitrary number of blocs (here assumes max = 4)
-    def tie_breaks
-      (1..8).map { |i| Sequel.pg_array_op(:tie_breaks)[i] }
+    def tie_break
+      rank_arr = (1..8).map { |i| Sequel.pg_array_op(:tie_breaks)[i] }
+
+      Sequel.function(:rank).over(order: rank_arr).as(:tie_break)
     end
 
     # Merge any update into the results, e.g.
