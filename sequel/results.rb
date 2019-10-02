@@ -20,4 +20,11 @@ class Results < Sequel::Model(:results)
         .where(wet_id: wet_id, grp_id: grp_id, route: route)
     end
   end
+
+  # merge a new result into the data record
+  # TODO: Do we really need to create a jsonb op for each call
+  def merge_result(hash)
+    jsonb = Sequel.pg_jsonb_op(:result_jsonb)
+    update(result_jsonb: jsonb.concat(hash))
+  end
 end

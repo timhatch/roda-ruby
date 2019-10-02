@@ -21,18 +21,11 @@ class CombinedBoulderResults < Results
   end
 end
 
+# dataset = @db[:results].where(wet_id: 1, route: 2, per_id: 5090)
+dataset = CombinedBoulderResults.where(wet_id: 1, route: 2, grp_id: 5)[per_id: 5090]
+hash    = { p1: { a: 3, b: 2, t: 3 }, p2: { a: 3, b: 4, t: nil } }
+dataset.merge_result(hash)
+
 # Test output
 CombinedBoulderResults.route(wet_id: 1, grp_id: 5, route: 2)
-#                      .each { |x| p x }
-
-# Create a JSONB Operation object for the "data" jsonb column in our table
-jsonb = Sequel.pg_jsonb_op(:result_jsonb)
-
-# dataset = @db[:results].where(wet_id: 1, route: 2, per_id: 5090)
-route = CombinedBoulderResults.where(wet_id: 1, route: 2, grp_id: 5)
-dataset = route[per_id: 5090]
-
-hash = { p1: { a: 3, b: 2, t: 0 }, p2: { a: 3, b: 4, t: nil } }
-dataset.update(result_jsonb: jsonb.concat(hash))
-
-# p dataset[:result_jsonb]
+                      .each { |x| p x }
