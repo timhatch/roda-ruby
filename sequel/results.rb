@@ -13,7 +13,7 @@ Sequel.extension :pg_json_ops # Needed to query stored arrays
 
 class Results < Sequel::Model(:results)
   dataset_module do
-    select :person, :per_id, :sort_values, :result_jsonb, :rank_prev_heat
+    select :person, :per_id, :result_jsonb, :rank_prev_heat
 
     def route(wet_id:, grp_id:, route:)
       person

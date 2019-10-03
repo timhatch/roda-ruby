@@ -1,8 +1,7 @@
 # Module  Perseus                 - The namespace for application code
-# Module  CombinedBoulderModus    - IFSCBoulderModus methods
+# Module  StandardBoulderModus    - IFSCBoulderModus methods
 
-require 'sequel'
-require 'pg'
+require 'ranker'
 
 module Perseus
   module StandardBoulderModus
@@ -20,47 +19,34 @@ module Perseus
       array[1] += value
     end
 
+    # sig ( returns(Proc).returns(T::Array[Integer)) }
+    def self.ifsc1999
+      ->(h) { [h[:sort_values][0], -h[:sort_values][1], h[:sort_values][2], -h[:sort_values][3]] }
+    end
+
+    # sig ( returns(Proc).returns(T::Array[Integer)) }
+    def self.ifsc2018
+      ->(h) { [h[:sort_values][0], h[:sort_values][2], -h[:sort_values][1], -h[:sort_values][3]] }
+    end
+
     module_function
 
-    # sig { returns(Sequel::AliasedExpression) }
-    # NOTE: Updated 18-02-2018 to use the revised scoring system for 2018
-    # Sequel helper function to calculate a rank-order value sorting a boulder result by
-    # tops (descending), bonuses (descending), top attempts (ascending), bonus attempts
-    # (ascending). The desc(nulls: :last) postfix ensures that results with a null value
-    # are ranked lower than results with a value of 0 (i.e. competitors who havenot started
-    # are always ranked below competitors who have started
-    # FIXME: This is fine for simple case where we use countbacks in a binary fashion, but it's
-    # doesn't deal with the case where we want to apply countbacks only for podium places
-    def base_rank
-      rank_arr = [
-        Sequel.pg_array_op(:sort_values)[1].desc(nulls: :last),
-        Sequel.pg_array_op(:sort_values)[3].desc,
-        Sequel.pg_array_op(:sort_values)[2],
-        Sequel.pg_array_op(:sort_values)[4]
-      ]
+    # sig { params(Hash).returns(Hash) }
+    def base_rank(results)
+      data = results.map { |x| x.merge(sort_values: sortvalues(x[:result_jsonb])) }
 
-      Sequel.function(:rank).over(order: rank_arr).as(:base_rank)
+      Ranker.rank(data, asc: true, strategy: :standard_competition, by: ifsc2018)
+            .flat_map { |x| x.rankables.map { |r| r.merge(base_rank: x.rank) } }
     end
 
-    # sig { returns(Sequel::AliasedExpression) }
-    # TODO: Modify to deal with an arbitrary number of blocs (here assumes max = 4)
-    def tie_break
-      rank_arr = (1..8).map { |i| Sequel.pg_array_op(:tie_breaks)[i] }
+    # sig { params(Hash).returns(Hash) }
+    def tie_break(results)
+      data  = results.map { |x| x.merge(tie_breaks: tiebreaks(x[:result_jsonb])) }
+      order = ->(h) { h[:tie_breaks] }
 
-      Sequel.function(:rank).over(order: rank_arr).as(:tie_break)
-    end
-
-    # Merge any update into the results, e.g.
-    # { p1: { a: 1, b: 1, t:1 }, p2: { a: 2 } }.merge( p2: { a: 3, b: 3 })
-    # becomes
-    # { p1: { a: 1, b: 1, t:1 }, p2: { a: 3, b: 3 } }
-    # @params
-    # - A Hash containing the unmodified result
-    # - A Hash containing the new result to be merged in
-    # NOTE: PostGreSQL's jsonb functionality may allow this to be dispensed with.
-    def merge(result, update)
-      result ||= {}
-      result.merge(update)
+      Ranker.rank(data, asc: false, strategy: :standard_competition, by: order)
+            .flat_map { |x| x.rankables.map { |r| r.merge(tie_break: x.rank) } }
+      # .map { |x| x.tap { |r| r.delete(:tie_breaks) } }
     end
 
     # Calculate the overall result for the competitor (i.e. 1t2 3b4), storing the result in
@@ -68,7 +54,7 @@ module Perseus
     # sig { params(result_jsonb: Hash).returns(Array[Integer]) }
     # NOTE: <result_jsonb> is a hash containing the result, e.g.
     #       { p1: { a: 1, b: 1, t:1 }, p2: { a: 3, b: 3 } }
-    def update_sortvalues(result_jsonb)
+    def sortvalues(result_jsonb)
       barr = [0, 0]
       tarr = [0, 0]
 
@@ -83,7 +69,7 @@ module Perseus
 
     # sig { params(result_jsonb: Hash).returns(Array[Integer]) }
     # TODO: Modify to deal with an arbitrary number of blocs (here assumes max = 4)
-    def update_tiebreaks(result_jsonb)
+    def tiebreaks(result_jsonb)
       barr = [0, 0, 0, 0]
       tarr = [0, 0, 0, 0]
 
