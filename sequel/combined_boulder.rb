@@ -3,7 +3,7 @@ require 'ranker'
 require_relative 'results'
 require_relative 'boulder_modus'
 
-class CombinedBoulderResults < Results
+class CombinedBoulderResult < Result
   # route - fetch a collection of models and add ranking data to each
   # sig { params(wet_id: Integer, grp_id: Integer, route: Integer).returns(T::Array[Hash]) }
   def self.route(wet_id:, grp_id:, route:)
@@ -30,5 +30,6 @@ end
 # dataset.merge_result(hash)
 
 # Test output
-CombinedBoulderResults.route(wet_id: 1, grp_id: 5, route: 2)
-                      .each { |x| p x }
+CombinedBoulderResult.route(wet_id: 1, grp_id: 5, route: 2)
+                     .each { |x| p x }
+
