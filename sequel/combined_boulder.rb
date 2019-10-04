@@ -1,5 +1,6 @@
 require 'ranker'
 
+require_relative 'competition'
 require_relative 'result'
 require_relative 'boulder_modus'
 
@@ -31,5 +32,19 @@ end
 
 # Test output
 CombinedBoulderResult.route(wet_id: 1, grp_id: 5, route: 2)
-                     .each { |x| p x }
+#                     .each { |x| p x }
 
+# TEST CREATION OF NEW COMPETiTION MODWL
+ params = { city: 'London', definition: 'invalid', wet_id: 200}
+
+# Works but "partially unsafe" (no checks on <params> but will not overwrite
+# Competition.insert_conflict(params)
+
+return if params[:wet_id].to_i.zero?
+#  puts "first test"
+comp = Competition.new.tap { |x| x.wet_id = params[:wet_id].to_i }
+return if comp.exists?
+
+#  puts "second test"
+comp.set_fields(params, [:city, :date, :title], missing: :skip)
+    .save
