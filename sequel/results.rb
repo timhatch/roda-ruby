@@ -11,21 +11,20 @@ require 'pg'
 Sequel.extension :pg_array_ops # Needed to query stored arrays
 Sequel.extension :pg_json_ops # Needed to query stored arrays
 
-class Climber < Sequel::Model(:climbers)
+class Person < Sequel::Model(:persons)
   one_to_many :results, key: :per_id # Note that a one-many association uses the plural model name
 end
 
 class Result < Sequel::Model(:results)
-  many_to_one :climber, key: :per_id # , select: %i[lastname firstname nation]
+  many_to_one :person, key: :per_id
 
   dataset_module do
-    select :person, :per_id, :result_jsonb, :rank_prev_heat
+    select :data, :per_id, :result_jsonb, :rank_prev_heat
 
     # route - fetch a collection of models from the database
     # sig { params(wet_id: Integer, grp_id: Integer, route: Integer).returns(Sequel::Dataset) }
     def route(wet_id:, grp_id:, route:)
-      person
-        .where(wet_id: wet_id, grp_id: grp_id, route: route)
+      data.where(wet_id: wet_id, grp_id: grp_id, route: route)
     end
   end
 
@@ -38,6 +37,6 @@ class Result < Sequel::Model(:results)
   end
 
   def to_hash
-    super.merge(climber.to_hash.slice(:firstname, :lastname, :nation))
+    super.merge(person.to_hash.slice(:firstname, :lastname, :nation))
   end
 end
