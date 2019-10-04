@@ -1,6 +1,6 @@
 require 'ranker'
 
-require_relative 'results'
+require_relative 'result'
 require_relative 'boulder_modus'
 
 class CombinedBoulderResult < Result
