@@ -4,6 +4,8 @@ require_relative 'results'
 require_relative 'boulder_modus'
 
 class CombinedBoulderResults < Results
+  # route - fetch a collection of models and add ranking data to each
+  # sig { params(wet_id: Integer, grp_id: Integer, route: Integer).returns(T::Array[Hash]) }
   def self.route(wet_id:, grp_id:, route:)
     super(wet_id: wet_id, grp_id: grp_id, route: route)
       .map(&:to_hash)
@@ -12,6 +14,8 @@ class CombinedBoulderResults < Results
       .yield_self(&method(:ranking))
   end
 
+  # ranking - calculate a result_rank for each model in the dataset
+  # sig { params(results: T:Array[Hash]).returns(T::Array[Hash]) }
   def self.ranking(results)
     order = ->(h) { [h[:base_rank], h[:tie_break], h[:rank_prev_heat] || 0] }
 
