@@ -18,7 +18,9 @@ class CombinedBoulderResult < Result
   # ranking - calculate a result_rank for each model in the dataset
   # sig { params(results: T:Array[Hash]).returns(T::Array[Hash]) }
   def self.ranking(results)
-    order = ->(h) { [h[:base_rank], h[:tie_break], h[:rank_prev_heat] || 0] }
+    order = lambda do |h|
+      [h.delete(:base), h.delete(:ties), h[:result_jsonb].empty? ? 1 : 0, h[:rank_prev_heat] || 0]
+    end
 
     Ranker.rank(results, asc: false, strategy: :standard_competition, by: order)
           .flat_map { |x| x.rankables.map { |r| r.merge(result_rank: x.rank) } }
