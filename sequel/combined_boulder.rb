@@ -17,6 +17,8 @@ class CombinedBoulderResult < Result
 
   # ranking - calculate a result_rank for each model in the dataset
   # sig { params(results: T:Array[Hash]).returns(T::Array[Hash]) }
+  # TODO: TRY (result_rank: nil if result_jsonb.empty?), i.e. where a competitor
+  # has not started
   def self.ranking(results)
     order = lambda do |h|
       [h.delete(:base), h.delete(:ties), h[:result_jsonb].empty? ? 1 : 0, h[:rank_prev_heat] || 0]
