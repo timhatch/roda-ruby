@@ -32,9 +32,7 @@ module Perseus
     def self.subarray(hash, key, n = 4) # rubocop:disable Naming/UncommunicativeMethodParamName
       arr = Array.new(n, 0)
 
-      hash.reduce(arr) do |a, (_k, v)|
-        a.push(v[key].to_i)
-      end.sort.slice(-n, n)
+      hash.reduce(arr) { |a, (_k, v)| a.push(v[key].to_i) }.sort.slice(-n, n)
     end
 
     module_function
@@ -46,7 +44,7 @@ module Perseus
       data = results.map { |x| x.merge(result: to_result_array(x[:result_jsonb])) }
 
       Ranker.rank(data, asc: true, strategy: :standard_competition, by: ifsc2018)
-            .flat_map { |x| x.rankables.map { |r| r.merge(base_rank: x.rank) } }
+            .flat_map { |x| x.rankables.map { |r| r.merge(base: x.rank) } }
     end
 
     # sig { params(results: T::Array[Hash]).returns(T::Array[Hash]) }
@@ -54,7 +52,7 @@ module Perseus
       order = ->(h) { to_attempt_array(h[:result_jsonb]) }
 
       Ranker.rank(results, asc: false, strategy: :standard_competition, by: order)
-            .flat_map { |x| x.rankables.map { |r| r.merge(tie_break: x.rank) } }
+            .flat_map { |x| x.rankables.map { |r| r.merge(ties: x.rank) } }
     end
 
     # RESULT AGGREGATION METHODS
