@@ -28,6 +28,12 @@ class Result < Sequel::Model(:results)
     end
   end
 
+  # result? - Test whether some item_as_hash has a result
+  # sig { params(hash: Hash).returns(Integer) }
+  def self.result?(hash)
+    hash[:result_jsonb].empty? ? 1 : 0
+  end
+
   # merge_result - merge a one or more results into a model instance
   # TODO: Do we really need to create a jsonb op for each call
   # sig { params(hash: Hash).void }
@@ -36,7 +42,7 @@ class Result < Sequel::Model(:results)
     update(result_jsonb: jsonb.concat(hash))
   end
 
-  def to_hash
-    super.merge(person.to_hash.slice(:firstname, :lastname, :nation))
-  end
+  # def to_hash
+  #   super.merge(person.to_hash.slice(:firstname, :lastname, :nation))
+  # end
 end

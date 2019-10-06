@@ -16,14 +16,15 @@ class CombinedBoulderResult < Result
   end
 
   # ranking - calculate a result_rank for each model in the dataset
+  # ranking order is result? -> T/Z/TA/ZA -> iiebreaks -> countback
   # sig { params(results: T:Array[Hash]).returns(T::Array[Hash]) }
-  # TODO: TRY (result_rank: nil if result_jsonb.empty?), i.e. where a competitor
-  # has not started
   def self.ranking(results)
     order = lambda do |h|
-      [h.delete(:base), h.delete(:ties), h[:result_jsonb].empty? ? 1 : 0, h[:rank_prev_heat] || 0]
+      [result?(h), h.delete(:base), h.delete(:ties), h[:rank_prev_heat] || 0]
     end
 
+    # TODO: Consider (result_rank: nil if result_jsonb.empty?), i.e. where a competitor
+    # has not started
     Ranker.rank(results, asc: false, strategy: :standard_competition, by: order)
           .flat_map { |x| x.rankables.map { |r| r.merge(result_rank: x.rank) } }
   end
@@ -36,19 +37,4 @@ end
 
 # Test output
 CombinedBoulderResult.route(wet_id: 1, grp_id: 5, route: 2)
-#                     .each { |x| p x }
-
-# TEST CREATION OF NEW COMPETiTION MODWL
- params = { city: 'London', definition: 'invalid', wet_id: 200}
-
-# Works but "partially unsafe" (no checks on <params> but will not overwrite
-# Competition.insert_conflict(params)
-
-return if params[:wet_id].to_i.zero?
-#  puts "first test"
-comp = Competition.new.tap { |x| x.wet_id = params[:wet_id].to_i }
-return if comp.exists?
-
-#  puts "second test"
-comp.set_fields(params, [:city, :date, :title], missing: :skip)
-    .save
+                     .each { |x| p x }
