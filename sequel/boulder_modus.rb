@@ -40,7 +40,7 @@ module Perseus
     # RANKING METHODS
 
     # sig { params(results: T::Array[Hash]).returns(T::Array[Hash]) }
-    def base_rank(results)
+    def add_rank(results)
       data = results.map { |x| x.merge(result: to_result_array(x[:result_jsonb])) }
 
       Ranker.rank(data, asc: true, strategy: :standard_competition, by: ifsc2018)
@@ -48,7 +48,7 @@ module Perseus
     end
 
     # sig { params(results: T::Array[Hash]).returns(T::Array[Hash]) }
-    def tie_break(results)
+    def add_atts(results)
       order = ->(h) { to_attempt_array(h[:result_jsonb]) }
 
       Ranker.rank(results, asc: false, strategy: :standard_competition, by: order)
@@ -58,8 +58,8 @@ module Perseus
     # RESULT AGGREGATION METHODS
 
     # result_array - return an integer array corresponding to the result T/TA/Z/ZA
+    # input <hash> has the form: { "p1" => { "a" => 1, "b" => 1, "t" => 1 }, ... }
     # sig { params(hash: Hash).returns(T::Array[Integer]) }
-    # `hash` has the form: { p1: { a: 1, b: 1, t:1 }, p2: { a: 3, b: 3 } }
     def to_result_array(hash)
       vec = Vector.zero(4)
 

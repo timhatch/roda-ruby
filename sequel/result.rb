@@ -19,7 +19,7 @@ class Result < Sequel::Model(:results)
   many_to_one :person, key: :per_id
 
   dataset_module do
-    select :data, :per_id, :result_jsonb, :rank_prev_heat
+    select :data, :per_id, :result_jsonb, :irm # , :rank_prev_heat, :bib_nr
 
     # route - fetch a collection of models from the database
     # sig { params(wet_id: Integer, grp_id: Integer, route: Integer).returns(Sequel::Dataset) }
