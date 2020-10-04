@@ -6,6 +6,8 @@ require 'graphql'
 
 module Mutations
   class BaseMutation < GraphQL::Schema::Mutation
+    field :success, Boolean, null: false
+    field :errors, [String], null: false
   end
 end
 
@@ -15,19 +17,24 @@ module Mutations
 
     argument :id, Integer, required: true
 
-    field :success, Boolean, null: false
-    field :errors, [String], null: false
-
     def resolve(id:)
-      puts id
-      puts 'Do something with data'
+      puts "Do something with athlete data #{id}"
       { success: true, errors: [] }
     end
   end
 end
 
-class MutationType < GraphQL::Schema::Object
-  description 'Update data'
+    def resolve(id:)
+      puts "Do something with results data #{id}"
+      { success: true, errors: [] }
+    end
+  end
+end
 
-  field :editPerson, mutation: Mutations::EditPerson
+module Types
+  class MutationType < GraphQL::Schema::Object
+    description 'Defined data mutations'
+
+    field :editPerson, mutation: Mutations::EditPerson
+  end
 end

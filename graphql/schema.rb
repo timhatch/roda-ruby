@@ -6,6 +6,6 @@ require_relative 'query'
 require_relative 'mutation'
 
 class AppSchema < GraphQL::Schema
-  query    RootQuery
-  mutation MutationType
+  query    Types::QueryType
+  mutation Types::MutationType
 end
