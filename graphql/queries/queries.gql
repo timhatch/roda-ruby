@@ -1,9 +1,31 @@
+# Query to retrieve one set of athlete data
+# Provide the $id value via variables = { "id": v }
+query GetSingle($id:!int!) {
+  person(id:$id) {
+    per_id
+    firstname
+    lastname
+  }
+}
+
+# Query to retrieve an array of results data
+query GetResult($id:Int!) {
+  result(id:$id) {
+    per_id
+    wet_id
+    route
+    sort_values
+  }
+}
+
 # Query to retrieve two sets of athlete data
+# Provide the $id1 and $id2 values via variables = { "id1": x, "id2": y }
+# Use fragment to define common structures
 query GetComparison($id1:Int!, $id2:Int!) {
-	left: person(id:$id1) {
+	alias_l: person(id:$id1) {
   	...comparisonFields
   }
-  right: person(id:$id2) {
+  alias_r: person(id:$id2) {
   	...comparisonFields
   }
 }
@@ -14,18 +36,10 @@ fragment comparisonFields on Athlete {
   lastname
 }
 
-# Query to retrieve one set of athlete data
-query GetSingle($id:!int!) {
-  person(id:$id) {
-    per_id
-    firstname
-    lastname
-  }
-}
-
 # Edit athelete data
+# Provide the $id value via variables = { "id": v }
 mutation EditAthlete($id:Int!) {
-	editPerson(id: $id) {
+	editPerson(id:$id) {
     success
     errors
   }
