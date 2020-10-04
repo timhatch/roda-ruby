@@ -15,3 +15,13 @@ module Types
     field :gender, String, null: false
   end
 end
+
+module Types
+  class Result < GraphQL::Types::Relay::BaseObject
+    field :per_id, Integer, null: true, camelize: false
+    field :wet_id, Integer, null: true, camelize: false
+    field :grp_id, Integer, null: true, camelize: false
+    field :route, Integer, null: true
+    field :sort_values, [Integer], null: true, camelize: false
+  end
+end

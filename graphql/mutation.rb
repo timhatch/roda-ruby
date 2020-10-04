@@ -2,7 +2,7 @@
 
 require 'graphql'
 
-# require_relative 'person_type'
+require_relative 'person_type'
 
 module Mutations
   class BaseMutation < GraphQL::Schema::Mutation
@@ -24,6 +24,12 @@ module Mutations
   end
 end
 
+module Mutations
+  class EditResult < Mutations::BaseMutation
+    description 'Edits a Result'
+
+    argument :id, Integer, required: true
+
     def resolve(id:)
       puts "Do something with results data #{id}"
       { success: true, errors: [] }
@@ -36,5 +42,6 @@ module Types
     description 'Defined data mutations'
 
     field :editPerson, mutation: Mutations::EditPerson
+    field :editResult, mutation: Mutations::EditResult
   end
 end

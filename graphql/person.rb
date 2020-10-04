@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require 'sequel'
 require 'pg'
@@ -16,5 +17,9 @@ module DataModels
   class Person < Sequel::Model(:persons)
     # Note that a one-many association uses the plural model name
     one_to_many :results, key: :per_id
+  end
+
+  class Result < Sequel::Model(:results)
+    many_to_one :person, key: :per_id
   end
 end
