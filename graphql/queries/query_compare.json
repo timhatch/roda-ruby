@@ -1,0 +1,7 @@
+{
+  "query": "query($id1:Int!, $id2:Int!) { left: person(id:$id1) { ...comparisonFields } right: person(id:$id2) { ...comparisonFields } } fragment comparisonFields on Athlete { per_id firstname lastname }",
+  "variables": {
+    "id1": 1030,
+    "id2": 907
+  }
+}

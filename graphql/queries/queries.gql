@@ -1,0 +1,32 @@
+# Query to retrieve two sets of athlete data
+query GetComparison($id1:Int!, $id2:Int!) {
+	left: person(id:$id1) {
+  	...comparisonFields
+  }
+  right: person(id:$id2) {
+  	...comparisonFields
+  }
+}
+
+fragment comparisonFields on Athlete {
+  per_id
+  firstname
+  lastname
+}
+
+# Query to retrieve one set of athlete data
+query GetSingle($id:!int!) {
+  person(id:$id) {
+    per_id
+    firstname
+    lastname
+  }
+}
+
+# Edit athelete data
+mutation EditAthlete($id:Int!) {
+	editPerson(id: $id) {
+    success
+    errors
+  }
+}

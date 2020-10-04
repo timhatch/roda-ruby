@@ -1,0 +1,4 @@
+{
+  "query": "query GetAthleteData($id:Int!) {person(id:$id) {per_id firstname lastname } }",
+  "variables": { "id": 1030 }
+}

@@ -1,0 +1,4 @@
+{
+  "query": "mutation EditPersonData($id:Int!) {editPerson(id:$id) { success errors } }",
+  "variables": {"id": 24}
+}

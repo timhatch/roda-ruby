@@ -1,21 +1,23 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    pg (1.1.4)
-    rack (2.0.7)
+    graphql (1.11.5)
+    pg (1.2.3)
+    rack (2.2.3)
     ranker (1.1.4)
-    roda (3.27.0)
+    roda (3.35.0)
       rack
-    sequel (5.27.0)
+    sequel (5.34.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  pg (~> 1.1.4)
+  graphql (~> 1.11.5)
+  pg (~> 1.2.3)
   ranker (~> 1.1.4)
-  roda (~> 3.27.0)
-  sequel (~> 5.27.0)
+  roda (~> 3.35.0)
+  sequel (~> 5.34.0)
 
 BUNDLED WITH
-   1.17.2
+   2.1.2

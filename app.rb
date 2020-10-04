@@ -11,6 +11,7 @@ class App < Roda
   plugin :json_parser # Parses request bodies as JSON where Content-Type==application/json
 
   Dir['./routes/*.rb'].each { |f| require f }
+  Dir['./graphql/*.rb'].each { |f| require f }
 
   # Convert params keys to symbols
   before do
